@@ -62,13 +62,17 @@ function isFlipTransition(transition) {
         transition?.effect === 'flip-from-left' ||
         transition?.effect === 'flip-from-right');
 }
+function getAnimationKey(source, recyclingKey) {
+    const uri = (source && 'uri' in source && source.uri) || '';
+    return recyclingKey ? [recyclingKey, uri].join('-') : uri;
+}
 export default function ExpoImage({ source, placeholder, contentFit, contentPosition, placeholderContentFit, cachePolicy, onLoad, transition, onError, responsivePolicy, onLoadEnd, priority, blurRadius, recyclingKey, style, nativeViewRef, containerViewRef, ...props }) {
     const imagePlaceholderContentFit = placeholderContentFit || 'scale-down';
     const imageHashStyle = {
         objectFit: placeholderContentFit || contentFit,
     };
     const selectedSource = useSourceSelection(source, responsivePolicy, containerViewRef, isFlipTransition(transition) ? setCssVariablesForFlipTransitions : null);
-    const initialNodeAnimationKey = (recyclingKey ? `${recyclingKey}-${placeholder?.[0]?.uri}` : placeholder?.[0]?.uri) ?? '';
+    const initialNodeAnimationKey = getAnimationKey(placeholder?.[0], recyclingKey);
     const initialNode = placeholder?.[0]?.uri
         ? [
             initialNodeAnimationKey,
@@ -81,9 +85,7 @@ export default function ExpoImage({ source, placeholder, contentFit, contentPosi
                 }} contentPosition={{ left: '50%', top: '50%' }} hashPlaceholderContentPosition={contentPosition} hashPlaceholderStyle={imageHashStyle}/>),
         ]
         : null;
-    const currentNodeAnimationKey = (recyclingKey
-        ? `${recyclingKey}-${selectedSource?.uri ?? placeholder?.[0]?.uri}`
-        : selectedSource?.uri ?? placeholder?.[0]?.uri) ?? '';
+    const currentNodeAnimationKey = getAnimationKey(selectedSource ?? placeholder?.[0], recyclingKey);
     const currentNode = [
         currentNodeAnimationKey,
         ({ onAnimationFinished, onReady, onMount, onError: onErrorInner }) => (className, style) => (<ImageWrapper {...props} ref={nativeViewRef} source={selectedSource || placeholder?.[0]} events={{

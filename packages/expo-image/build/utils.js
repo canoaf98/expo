@@ -1,3 +1,4 @@
+import ImageModule from './ImageModule';
 let loggedResizeModeDeprecationWarning = false;
 let loggedRepeatDeprecationWarning = false;
 let loggedFadeDurationDeprecationWarning = false;
@@ -81,5 +82,11 @@ export function resolveTransition(transition, fadeDuration) {
         return { duration: fadeDuration };
     }
     return transition ?? null;
+}
+/**
+ * Checks whether the given value is an instance of the ImageRef class.
+ */
+export function isImageRef(value) {
+    return value instanceof ImageModule.Image;
 }
 //# sourceMappingURL=utils.js.map

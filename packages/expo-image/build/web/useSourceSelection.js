@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isImageRef } from '../utils';
 import { isBlurhashString, isThumbhashString } from '../utils/resolveSources';
 function findBestSourceForSize(sources, size) {
     if (sources?.length === 1) {
@@ -60,7 +61,7 @@ function selectSource(sources, size, responsivePolicy) {
     };
 }
 export default function useSourceSelection(sources, responsivePolicy = 'static', containerRef, measurementCallback = null) {
-    const hasMoreThanOneSource = (sources?.length ?? 0) > 1;
+    const hasMoreThanOneSource = (Array.isArray(sources) ? sources.length : 0) > 1;
     const [size, setSize] = useState(containerRef.current?.getBoundingClientRect() ?? null);
     if (size && containerRef.current) {
         measurementCallback?.(containerRef.current, size);
@@ -81,6 +82,10 @@ export default function useSourceSelection(sources, responsivePolicy = 'static',
         }
         return () => { };
     }, [responsivePolicy, hasMoreThanOneSource, containerRef.current, measurementCallback]);
+    if (isImageRef(sources)) {
+        // There is always only one image ref, so there is nothing else to select from.
+        return sources;
+    }
     return selectSource(sources, size, responsivePolicy);
 }
 //# sourceMappingURL=useSourceSelection.js.map

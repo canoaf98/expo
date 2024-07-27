@@ -1,5 +1,6 @@
 import resolveAssetSource from './resolveAssetSource';
 import { resolveBlurhashString, resolveThumbhashString } from './resolveHashString';
+import { isImageRef } from '../utils';
 export function isBlurhashString(str) {
     return /^(blurhash:\/)+[\w#$%*+,\-.:;=?@[\]^_{}|~]+(\/[\d.]+)*$/.test(str);
 }
@@ -39,6 +40,10 @@ function resolveSource(source) {
 export function resolveSources(sources) {
     if (Array.isArray(sources)) {
         return sources.map(resolveSource).filter(Boolean);
+    }
+    if (isImageRef(sources)) {
+        // @ts-expect-error
+        return sources.__expo_shared_object_id__;
     }
     return [resolveSource(sources)].filter(Boolean);
 }
